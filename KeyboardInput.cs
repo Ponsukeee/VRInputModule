@@ -1,106 +1,105 @@
 ﻿using UnityEngine;
-using VRUtils.Components;
 
 namespace VRUtils.InputModule
 {
-public class KeyboardInput : IInputDevice
+public class KeyboardInput : MonoBehaviour, IInputDevice
 {
-    public bool PressDownTrigger()
+    public bool ClickDown()
     {
         return Input.GetKeyDown(KeyCode.T);
     }
 
-    public bool PressTrigger()
+    public bool Clicking()
     {
         return Input.GetKey(KeyCode.T);
     }
 
-    public bool PressUpTrigger()
+    public bool ClickUp()
     {
         return Input.GetKeyUp(KeyCode.T);
     }
 
-    public bool PressDownTouchpad()
+    public bool PadDown()
     {
         throw new System.NotImplementedException();
     }
 
-    public bool PressTouchpad()
+    public bool PadPressing()
     {
         throw new System.NotImplementedException();
     }
 
-    public bool PressUpTouchpad()
+    public bool PadUp()
     {
         throw new System.NotImplementedException();
     }
 
-    public bool PressUpSideTouchpad()
+    public bool UpSidePadPressing()
     {
         return Input.GetKeyDown(KeyCode.UpArrow);
     }
 
-    public bool PressDownSideTouchpad()
+    public bool DownSidePadPressing()
     {
         return Input.GetKeyDown(KeyCode.DownArrow);
     }
 
-    public bool PressRightSideTouchpad()
+    public bool RightSidePadPressing()
     {
         return Input.GetKeyDown(KeyCode.RightArrow);
     }
 
-    public bool PressLeftSideTouchpad()
+    public bool LeftSidePadPressing()
     {
         return Input.GetKeyDown(KeyCode.LeftArrow);
     }
 
-    public bool PressUpUpSideTouchpad()
+    public bool UpSidePadUp()
     {
         throw new System.NotImplementedException();
     }
 
-    public bool PressUpDownSideTouchpad()
+    public bool DownSidePadUp()
     {
         throw new System.NotImplementedException();
     }
 
-    public bool PressUpRightSideTouchpad()
+    public bool RightSidePadUp()
     {
         throw new System.NotImplementedException();
     }
 
-    public bool PressUpLeftSideTouchpad()
+    public bool LeftSidePadUp()
     {
         throw new System.NotImplementedException();
     }
 
-    public bool PressDownGrip()
+    public bool SubClickDown()
     {
         return Input.GetKeyDown(KeyCode.G);
     }
 
-    public bool PressGrip()
+    public bool SubClicking()
     {
         throw new System.NotImplementedException();
     }
 
-    public bool PressUpGrip()
+    public bool SubClickUp()
     {
         throw new System.NotImplementedException();
     }
 
-    public bool PressDownApplicationMenu()
+    public bool MenuDown()
     {
         return Input.GetKeyDown(KeyCode.A);
     }
 
-    public bool PressApplicationMenu()
+    public bool MenuPressing()
     {
         throw new System.NotImplementedException();
     }
 
-    public bool PressUpApplicationMenu()
+    public bool MenuUp()
     {
         throw new System.NotImplementedException();
     }

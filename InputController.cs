@@ -1,5 +1,5 @@
-﻿using System.Collections;
-using Components.Controller;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 
 namespace VRUtils.InputModule
@@ -8,12 +8,12 @@ public enum InputType
 {
     Click,
     DoubleClick,
-    Drag,
+    Clicking,
     Release,
 
     SubClick,
     SubDoubleClick,
-    SubDrag,
+    SubClicking,
     SubRelease,
 
     Up,
@@ -31,6 +31,7 @@ public enum InputType
 [RequireComponent(typeof(Collider))]
 public class InputController : MonoBehaviour
 {
+    private delegate bool Predicate();
     private IInputDevice inputDevice;
     public DeviceInfo DeviceInfo { get; private set; }
     private bool isPressingAnyButton;
@@ -43,13 +44,12 @@ public class InputController : MonoBehaviour
 
     [SerializeField] private GameObject defaultInputModuleObject;
     [SerializeField, Range(10, 50)] private int intervalOfDoubleClick = 30;
-    [SerializeField] private InputDeviceAssignor.DeviceType deviceType;
 
     private bool IsHandling => handlingModule != null;
 
     private void Awake()
     {
-        inputDevice = gameObject.AddComponent<InputDeviceAssignor>().AssignInputDevice(deviceType);
+        inputDevice = GetComponent<IInputDevice>();
         DeviceInfo = new DeviceInfo(gameObject, inputDevice);
         selectorManager = new InputModuleSelectorManager(gameObject, inputDevice);
         
@@ -65,40 +65,6 @@ public class InputController : MonoBehaviour
     private void LateUpdate()
     {
         isPressingAnyButton = inputDevice.PressingAnyButton();
-    }
-
-    private IEnumerator JudgeDoubleClick(InputType inputType)
-    {
-        for (int i = 0; i < intervalOfDoubleClick; i++)
-        {
-            if (hasClicked && inputDevice.PressDownTrigger())
-            {
-                hasClicked = false;
-                SendInput(inputType);
-                yield break;
-            }
-
-            yield return null;
-        }
-
-        hasClicked = false;
-    }
-
-    private IEnumerator JudgeSubDoubleClick(InputType inputType)
-    {
-        for (int i = 0; i < intervalOfDoubleClick; i++)
-        {
-            if (hasSubClicked && inputDevice.PressDownGrip())
-            {
-                hasSubClicked = false;
-                SendInput(inputType);
-                yield break;
-            }
-
-            yield return null;
-        }
-
-        hasSubClicked = false;
     }
 
     private void SendInput(InputType inputType)
@@ -126,98 +92,115 @@ public class InputController : MonoBehaviour
 
     private void ReceiveInput()
     {
-        if (inputDevice.PressDownApplicationMenu())
+        if (inputDevice.MenuDown())
         {
             selectorManager.SwitchSelector();
             handlingModule = null;
         }
 
-        if (inputDevice.PressDownTrigger())
+        if (inputDevice.ClickDown())
         {
             if (hasClicked == false)
             {
                 SendInput(InputType.Click);
-                StartCoroutine(JudgeDoubleClick(InputType.DoubleClick));
+                StartCoroutine(JudgeDoubleClick(InputType.DoubleClick, inputDevice.ClickDown));
                 hasClicked = true;
             }
         }
 
-        if (inputDevice.PressTrigger())
+        if (inputDevice.Clicking())
         {
-            if (inputDevice.PressDownTrigger()) return;
+            if (inputDevice.ClickDown()) return;
 
-            SendInput(InputType.Drag);
+            SendInput(InputType.Clicking);
         }
 
-        if (inputDevice.PressUpTrigger())
+        if (inputDevice.ClickUp())
         {
             SendInput(InputType.Release);
         }
 
-        if (inputDevice.PressDownGrip())
+        if (inputDevice.SubClickDown())
         {
-            if (hasSubClicked == false)
+            if (hasClicked == false)
             {
                 SendInput(InputType.SubClick);
-                StartCoroutine(JudgeSubDoubleClick(InputType.SubDoubleClick));
-                hasSubClicked = true;
+                StartCoroutine(JudgeDoubleClick(InputType.DoubleClick, inputDevice.SubClickDown));
+                hasClicked = true;
             }
         }
 
-        if (inputDevice.PressGrip())
+        if (inputDevice.SubClicking())
         {
-            SendInput(InputType.SubDrag);
+            SendInput(InputType.SubClicking);
         }
 
-        if (inputDevice.PressUpGrip())
+        if (inputDevice.SubClickUp())
         {
             SendInput(InputType.SubRelease);
         }
 
-        if (inputDevice.PressUpSideTouchpad())
+        if (inputDevice.UpSidePadPressing())
         {
             SendInput(InputType.Up);
         }
 
-        if (inputDevice.PressDownSideTouchpad())
+        if (inputDevice.DownSidePadPressing())
         {
             SendInput(InputType.Down);
         }
 
-        if (inputDevice.PressRightSideTouchpad())
+        if (inputDevice.RightSidePadPressing())
         {
             SendInput(InputType.Right);
         }
 
-        if (inputDevice.PressLeftSideTouchpad())
+        if (inputDevice.LeftSidePadPressing())
         {
             SendInput(InputType.Left);
         }
 
-        if (inputDevice.PressUpTouchpad())
+        if (inputDevice.PadUp())
         {
             SendInput(InputType.ReleasePad);
         }
 
-        if (inputDevice.PressUpUpSideTouchpad())
+        if (inputDevice.UpSidePadUp())
         {
             SendInput(InputType.ReleaseUp);
         }
 
-        if (inputDevice.PressUpDownSideTouchpad())
+        if (inputDevice.DownSidePadUp())
         {
             SendInput(InputType.ReleaseDown);
         }
 
-        if (inputDevice.PressUpRightSideTouchpad())
+        if (inputDevice.RightSidePadUp())
         {
             SendInput(InputType.ReleaseRight);
         }
 
-        if (inputDevice.PressUpLeftSideTouchpad())
+        if (inputDevice.LeftSidePadUp())
         {
             SendInput(InputType.ReleaseLeft);
         }
+    }
+
+    private IEnumerator JudgeDoubleClick(InputType inputType, Predicate pred)
+    {
+        for (int i = 0; i < intervalOfDoubleClick; i++)
+        {
+            if (hasClicked && pred())
+            {
+                hasClicked = false;
+                SendInput(inputType);
+                yield break;
+            }
+
+            yield return null;
+        }
+
+        hasClicked = false;
     }
 
     //for debug

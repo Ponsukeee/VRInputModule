@@ -1,184 +1,191 @@
 ﻿using UnityEngine;
 using Valve.VR;
-using Valve.VR.InteractionSystem;
 using VRUtils.InputModule;
 
-namespace VRUtils.InputModuleVRUtils.Components
+namespace VRUtils.InputModule
 {
-public class ViveInputDeviceSupport : IInputDevice
+public class ViveInputDeviceSupport : MonoBehaviour, IInputDevice
 {
-    private Hand hand;
+    [SerializeField] private SteamVR_Action_Boolean click;
+    [SerializeField] private SteamVR_Action_Boolean subClick;
+    [SerializeField] private SteamVR_Action_Boolean pad;
+    [SerializeField] private SteamVR_Action_Boolean menu;
+    [SerializeField] private SteamVR_Action_Pose pose;
+    [SerializeField] private SteamVR_Action_Vibration haptic;
+    [SerializeField] private SteamVR_Action_Vector2 padAxis;
+    
+    private SteamVR_Input_Sources handType;
+    private SteamVR_Behaviour_Pose trackedObject;
 
-    private float TouchPositionX => SteamVR_Input._default.inActions.TouchpadAxis.GetAxis(hand.handType).x;
-    private float TouchPositionY => SteamVR_Input._default.inActions.TouchpadAxis.GetAxis(hand.handType).y;
+    private float TouchPositionX => padAxis.GetAxis(handType).x;
+    private float TouchPositionY => padAxis.GetAxis(handType).y;
 
-    public ViveInputDeviceSupport(Hand hand)
+    private void Awake()
     {
-        this.hand = hand;
+        this.trackedObject = GetComponent<SteamVR_Behaviour_Pose>();
+        handType = trackedObject.inputSource;
     }
 
     //Trigger
-    public bool PressDownTrigger()
+    public bool ClickDown()
     {
-        if(SteamVR_Input._default.inActions.Trigger.GetStateDown(hand.handType))
+        if(click.GetStateDown(handType))
         {
-            SteamVR_Input._default.outActions.Haptic.Execute(0f, 0.1f, 1f, 0.5f, hand.handType);
+            haptic.Execute(0f, 0.1f, 1f, 0.5f, handType);
             return true;
         }
 
         return false;
     }
 
-    public bool PressTrigger()
+    public bool Clicking()
     {
-        return SteamVR_Input._default.inActions.Trigger.GetState(hand.handType);
+        return click.GetState(handType);
     }
 
-    public bool PressUpTrigger()
+    public bool ClickUp()
     {
-        return SteamVR_Input._default.inActions.Trigger.GetStateUp(hand.handType);
+        return click.GetStateUp(handType);
     }
 
     //Touchpad
-    public bool PressDownTouchpad()
+    public bool PadDown()
     {
-        return SteamVR_Input._default.inActions.Touchpad.GetStateDown(hand.handType);
+        return pad.GetStateDown(handType);
     }
 
-    public bool PressUpTouchpad()
+    public bool PadUp()
     {
-        return SteamVR_Input._default.inActions.Touchpad.GetStateUp(hand.handType);
+        return pad.GetStateUp(handType);
     }
 
-    public bool PressTouchpad()
+    public bool PadPressing()
     {
-        return SteamVR_Input._default.inActions.Touchpad.GetState(hand.handType);
+        return pad.GetState(handType);
     }
 
-    public bool PressUpSideTouchpad()
+    public bool UpSidePadPressing()
     {
-        if (PressTouchpad())
+        if (PadPressing())
             return (TouchPositionY / TouchPositionX > 1 || TouchPositionY / TouchPositionX < -1) && TouchPositionY > 0;
 
         return false;
     }
 
-    public bool PressDownSideTouchpad()
+    public bool DownSidePadPressing()
     {
-        if (PressTouchpad())
+        if (PadPressing())
             return (TouchPositionY / TouchPositionX > 1 || TouchPositionY / TouchPositionX < -1) && TouchPositionY < 0;
 
         return false;
     }
 
-    public bool PressRightSideTouchpad()
+    public bool RightSidePadPressing()
     {
-        if (PressTouchpad())
+        if (PadPressing())
             return (TouchPositionX / TouchPositionY > 1 || TouchPositionX / TouchPositionY < -1) && TouchPositionX > 0;
 
         return false;
     }
 
-    public bool PressLeftSideTouchpad()
+    public bool LeftSidePadPressing()
     {
-        if (PressTouchpad())
+        if (PadPressing())
             return (TouchPositionX / TouchPositionY > 1 || TouchPositionX / TouchPositionY < -1) && TouchPositionX < 0;
 
         return false;
     }
     
-    public bool PressUpUpSideTouchpad()
+    public bool UpSidePadUp()
     {
-        if (PressUpTouchpad())
+        if (PadUp())
             return (TouchPositionY / TouchPositionX > 1 || TouchPositionY / TouchPositionX < -1) && TouchPositionY > 0;
 
         return false;
     }
 
-    public bool PressUpDownSideTouchpad()
+    public bool DownSidePadUp()
     {
-        if (PressUpTouchpad())
+        if (PadUp())
             return (TouchPositionY / TouchPositionX > 1 || TouchPositionY / TouchPositionX < -1) && TouchPositionY < 0;
 
         return false;
     }
 
-    public bool PressUpRightSideTouchpad()
+    public bool RightSidePadUp()
     {
-        if (PressUpTouchpad())
+        if (PadUp())
             return (TouchPositionX / TouchPositionY > 1 || TouchPositionX / TouchPositionY < -1) && TouchPositionX > 0;
 
         return false;
     }
 
-    public bool PressUpLeftSideTouchpad()
+    public bool LeftSidePadUp()
     {
-        if (PressUpTouchpad())
+        if (PadUp())
             return (TouchPositionX / TouchPositionY > 1 || TouchPositionX / TouchPositionY < -1) && TouchPositionX < 0;
 
         return false;
     }
 
-    public bool PressDownGrip()
+    public bool SubClickDown()
     {
-        return SteamVR_Input._default.inActions.GrabGrip.GetStateDown(hand.handType);
+        return subClick.GetStateDown(handType);
     }
 
-    public bool PressGrip()
+    public bool SubClicking()
     {
-        return SteamVR_Input._default.inActions.GrabGrip.GetState(hand.handType);
+        return subClick.GetState(handType);
     }
 
-    public bool PressUpGrip()
+    public bool SubClickUp()
     {
-        return SteamVR_Input._default.inActions.GrabGrip.GetStateUp(hand.handType);
+        return subClick.GetStateUp(handType);
     }
 
-    public bool PressDownApplicationMenu()
+    public bool MenuDown()
     {
-        return SteamVR_Input._default.inActions.ApplicationMenu.GetStateDown(hand.handType);
+        return menu.GetStateDown(handType);
     }
 
-    public bool PressApplicationMenu()
+    public bool MenuPressing()
     {
-        return SteamVR_Input._default.inActions.ApplicationMenu.GetState(hand.handType);
+        return menu.GetState(handType);
     }
 
-    public bool PressUpApplicationMenu()
+    public bool MenuUp()
     {
-        return SteamVR_Input._default.inActions.ApplicationMenu.GetStateUp(hand.handType);
+        return menu.GetStateUp(handType);
     }
 
     public Vector3 DifferenceLocalPosition()
     {
-        return SteamVR_Input._default.inActions.Pose.GetLocalPosition(hand.handType) -
-               SteamVR_Input._default.inActions.Pose.GetLastLocalPosition(hand.handType);
+        return pose.GetLocalPosition(handType) - pose.GetLastLocalPosition(handType);
     }
 
     public Quaternion DifferenceLocalRotation()
     {
-        return SteamVR_Input._default.inActions.Pose.GetLocalRotation(hand.handType) *
-               Quaternion.Inverse(SteamVR_Input._default.inActions.Pose.GetLastLocalRotation(hand.handType));
+        return pose.GetLocalRotation(handType) * Quaternion.Inverse(pose.GetLastLocalRotation(handType));
     }
 
     public Vector3 ControllerVelocity()
     {
-        return hand.GetTrackedObjectVelocity();
+        return trackedObject.GetVelocity();
     }
 
     public Vector3 ControllerAngularVelocity()
     {
-        return hand.GetTrackedObjectAngularVelocity();
+        return trackedObject.GetAngularVelocity();
     }
 
     public void HapticPulse()
     {
-        SteamVR_Input._default.outActions.Haptic.Execute(0f, 0.1f, 1f, 1000f, hand.handType);
+        haptic.Execute(0f, 0.1f, 1f, 1000f, handType);
     }
 
     public bool PressingAnyButton()
     {
-        return PressTrigger() || PressGrip() || PressTouchpad() || PressApplicationMenu();
+        return Clicking() || SubClicking() || PadPressing() || MenuPressing();
     }
 }
 }

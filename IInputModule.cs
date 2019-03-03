@@ -1,7 +1,4 @@
-﻿using System.Threading.Tasks;
-using VRUtils.Components;
-
-namespace VRUtils.InputModule
+﻿namespace VRUtils.InputModule
 {
 public interface IInputModule
 {

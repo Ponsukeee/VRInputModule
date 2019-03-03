@@ -5,34 +5,34 @@ namespace VRUtils.InputModule
     public interface IInputDevice
     {
         //Trigger
-        bool PressDownTrigger();
-        bool PressTrigger();
-        bool PressUpTrigger();
+        bool ClickDown();
+        bool Clicking();
+        bool ClickUp();
 
         //Touchpad
-        bool PressDownTouchpad();
-        bool PressTouchpad();
-        bool PressUpTouchpad();
+        bool PadDown();
+        bool PadPressing();
+        bool PadUp();
         
-        bool PressUpSideTouchpad();
-        bool PressDownSideTouchpad();
-        bool PressRightSideTouchpad();
-        bool PressLeftSideTouchpad();
+        bool UpSidePadPressing();
+        bool DownSidePadPressing();
+        bool RightSidePadPressing();
+        bool LeftSidePadPressing();
         
-        bool PressUpUpSideTouchpad();
-        bool PressUpDownSideTouchpad();
-        bool PressUpRightSideTouchpad();
-        bool PressUpLeftSideTouchpad();
+        bool UpSidePadUp();
+        bool DownSidePadUp();
+        bool RightSidePadUp();
+        bool LeftSidePadUp();
 
         //Grip
-        bool PressDownGrip();
-        bool PressGrip();
-        bool PressUpGrip();
+        bool SubClickDown();
+        bool SubClicking();
+        bool SubClickUp();
 
         //ApplicationMenu
-        bool PressDownApplicationMenu();
-        bool PressApplicationMenu();
-        bool PressUpApplicationMenu();
+        bool MenuDown();
+        bool MenuPressing();
+        bool MenuUp();
         
         //Movement
         Vector3 DifferenceLocalPosition();
