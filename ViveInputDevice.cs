@@ -4,7 +4,7 @@ using VRUtils.InputModule;
 
 namespace VRUtils.InputModule
 {
-public class ViveInputDeviceSupport : MonoBehaviour, IInputDevice
+public class ViveInputDevice : MonoBehaviour, IInputDevice
 {
     [SerializeField] private SteamVR_Action_Boolean click;
     [SerializeField] private SteamVR_Action_Boolean subClick;
@@ -22,7 +22,7 @@ public class ViveInputDeviceSupport : MonoBehaviour, IInputDevice
 
     private void Awake()
     {
-        this.trackedObject = GetComponent<SteamVR_Behaviour_Pose>();
+        trackedObject = GetComponent<SteamVR_Behaviour_Pose>();
         handType = trackedObject.inputSource;
     }
 
